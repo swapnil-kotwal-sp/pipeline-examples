@@ -44,6 +44,7 @@ node('Linux_node190') {
 
          sh 'node -v'
          sh 'npm prune'
+         sh 'npm init'
          sh 'npm install'
          sh 'npm test'
 
