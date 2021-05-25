@@ -1,0 +1,85 @@
+#!/usr/bin/env groovy
+pipeline {
+   agent any
+    
+   environment {
+      VALUE_ONE = '1'
+      VALUE_TWO = '2'
+      VALUE_THREE = '3'
+   }
+    
+   stages {
+   
+      // skip a stage while creating the pipeline
+      stage("Create a CCG Build") {
+         when {
+            expression { true }  //skip this stage
+         }
+         steps {
+            echo 'Create a CCG Build Created Sucessfully!!!'
+         }
+      }
+      
+      // Execute when branch = 'master'
+      stage("Setup Automation Environment") {
+         when {
+            branch 'master'
+	 }
+         steps {
+            echo 'Setup Automation Environment!'
+         }
+      }
+      
+      // Expression based when example with AND
+      stage('Trigger Connector Automation') {
+         when {
+            expression {
+               VALUE_ONE == '1' && VALUE_THREE == '3'
+            }
+         }
+         steps {
+            echo 'Trigger Connector Automation!!!'
+         }
+      }
+      
+      // Expression based when example
+      stage('Trigger E2E Automation') {
+         when {
+            expression {
+               VALUE_ONE == '1' || VALUE_THREE == '2'
+            }
+         }
+         steps {
+            echo 'Triggered E2E Automation!'
+         }
+      }
+      
+      // When - AllOf Example
+      stage("Update the deploy defect") {
+        when {
+            allOf {
+                environment name:'VALUE_ONE', value: '1'
+                environment name:'VALUE_TWO', value: '2'
+            }
+        }
+        steps {
+            echo "Deploy defect updated!!"
+        }
+      }
+      
+      // When - Not AnyOf Example
+      stage("Approve Deploy Ticket") {
+         when {
+            not {
+               anyOf {
+                  branch "development"
+                  environment name:'VALUE_TWO', value: '4'
+               }
+            }
+         }
+         steps {
+            echo "Ticket Approved for pre-pods!"
+         }
+      }
+   }
+}
